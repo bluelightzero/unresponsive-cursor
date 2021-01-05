@@ -3,6 +3,7 @@ package bluelightzero;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.ClientTick;
@@ -29,6 +30,7 @@ public class UnresponsiveCursorPlugin extends Plugin
 	@Inject
 	private ClientUI clientUI;
 
+	private boolean wasLagging = false;
 	private long lastTickTime;
 
 	@Inject
@@ -42,14 +44,20 @@ public class UnresponsiveCursorPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
+		if(wasLagging) {
+			wasLagging = false;
+			clientUI.resetCursor();
+		}
 	}
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
-		if (gameStateChanged.getGameState() == GameState.CONNECTION_LOST)
-		{
-			//client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.lagThreshold(), null);
+		if(gameStateChanged.getGameState() == GameState.LOGIN_SCREEN) {
+			if(wasLagging) {
+				wasLagging = false;
+				clientUI.resetCursor();
+			}
 		}
 	}
 
@@ -67,14 +75,17 @@ public class UnresponsiveCursorPlugin extends Plugin
 
 		long diff = now-lastTickTime;
 
-		Cursor c;
-		if(diff > (600 + config.lagThreshold())) {
-			c = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
-		} else {
-			c = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-		}
+		boolean isLagging = diff > (600 + config.lagThreshold());
 
-		clientUI.setCursor(c);
+		boolean isDefaultCursor = (clientUI.getCurrentCursor().getType() == Cursor.DEFAULT_CURSOR);
+
+		if(isLagging && !wasLagging && isDefaultCursor) {
+			clientUI.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			wasLagging = true;
+		} else if(!isLagging && wasLagging) {
+			clientUI.resetCursor();
+			wasLagging = false;
+		}
 	}
 
 	@Provides
