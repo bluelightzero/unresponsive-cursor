@@ -59,12 +59,11 @@ public class UnresponsiveCursorPlugin extends Plugin
 	private Cursor replacedCursor = null;
 	private long lastTickTime;
 
-	// All used for pinging
 	private ScheduledExecutorService scheduledExecutorService;
 	private static final int TIMEOUT = 1000;
 	private static final int PORT = 43594;
 	private long lastPingTime;
-	private LinkedList<Long> recentPings = new LinkedList<>();
+	private final LinkedList<Long> recentPings = new LinkedList<>();
 	private long lastPongTime;
 	private long lastPingLatency;
 
@@ -129,10 +128,7 @@ public class UnresponsiveCursorPlugin extends Plugin
 			long after = new Date().getTime();
 			lastPongTime = after;
 			lastPingLatency = after - before;
-
-			client.addChatMessage(ChatMessageType.CONSOLE, "ping-log", "Latency = "+lastPingLatency, "Unresponsive Cursor");
 		} catch (IOException exception) {
-			client.addChatMessage(ChatMessageType.CONSOLE, "ping-log", "Latency = 1000+", "Unresponsive Cursor");
 		}
 	}
 
