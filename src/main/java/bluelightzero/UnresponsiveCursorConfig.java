@@ -21,7 +21,7 @@ public interface UnresponsiveCursorConfig extends Config {
 	String connectionLostSection = "Connection Lost Style";
 
 	@Range(
-			min = 50
+			min = 0
 	)
 	@ConfigItem(
 			keyName = "delay",

@@ -56,6 +56,7 @@ public class UnresponsiveCursorPlugin extends Plugin
 	private static final int PING_FAST_INTERVAL = 200;
 
 	private boolean wasLagging = false;
+	private Cursor replacedCursor = null;
 	private long lastTickTime;
 
 	// All used for pinging
@@ -168,12 +169,24 @@ public class UnresponsiveCursorPlugin extends Plugin
 		}
 
 		boolean isDefaultCursor = (clientUI.getCurrentCursor().getType() == Cursor.DEFAULT_CURSOR);
+		boolean isCustomCursor = (clientUI.getCurrentCursor().getType() == Cursor.CUSTOM_CURSOR);
 
-		if(isLagging && !wasLagging && isDefaultCursor) {
-			clientUI.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			wasLagging = true;
+		if(isLagging && !wasLagging) {
+			if(isDefaultCursor) {
+				replacedCursor = null;
+				clientUI.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				wasLagging = true;
+			} else if(isCustomCursor) {
+				replacedCursor = clientUI.getCurrentCursor();
+				clientUI.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				wasLagging = true;
+			}
 		} else if(!isLagging && wasLagging) {
-			clientUI.resetCursor();
+			if(replacedCursor != null) {
+				clientUI.setCursor(replacedCursor);
+			} else {
+				clientUI.resetCursor();
+			}
 			wasLagging = false;
 		}
 
