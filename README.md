@@ -15,6 +15,10 @@ You often see these as the whole world stopping for everyone.
 
 It should help when you are doing activities that require timing, but the server is lagging.
 
+# Version 1.3
+
+ - You can now toggle the text on and off.
+
 # Version 1.2
 
  - You can now have a message next to the cursor for lag type.

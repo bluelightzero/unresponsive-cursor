@@ -151,14 +151,18 @@ public class UnresponsiveCursorPlugin extends Plugin
 
 		boolean isLagging = timeSinceLastTick > (600 + config.lagThreshold());
 
-		if(isLagging && hasBeenRecentPing()) {
-			long timeSincePong = now-lastPongTime;
-			if (timeSincePong > PING_FAST_INTERVAL + lastPingLatency) {
-				infoOverlay.setText(config.connectionLostText());
-				infoOverlay.setColor(config.connectionLostTextColor());
+		if(config.enableText()) {
+			if (isLagging && hasBeenRecentPing()) {
+				long timeSincePong = now - lastPongTime;
+				if (timeSincePong > PING_FAST_INTERVAL + lastPingLatency) {
+					infoOverlay.setText(config.connectionLostText());
+					infoOverlay.setColor(config.connectionLostTextColor());
+				} else {
+					infoOverlay.setText(config.serverLagText());
+					infoOverlay.setColor(config.serverLagTextColor());
+				}
 			} else {
-				infoOverlay.setText(config.serverLagText());
-				infoOverlay.setColor(config.serverLagTextColor());
+				infoOverlay.clearText();
 			}
 		} else {
 			infoOverlay.clearText();
